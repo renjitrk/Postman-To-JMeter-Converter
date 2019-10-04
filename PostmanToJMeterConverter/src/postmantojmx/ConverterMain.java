@@ -7,18 +7,16 @@ import org.json.simple.parser.ParseException;
 public class ConverterMain {
 
 	public static void main(String[] args) throws IOException, ParseException {
-		
-		System.out.println("Hello!");
-		String postmanJsonPath = "C:/Users/renjith/Desktop/StarkTest.postman_collection.json";
-		
-		JsonJmxConverter converter = new JsonJmxConverter();
-		converter.convert(postmanJsonPath);
-		
-		
-		
+
+		if (args.length == 0) {
+			System.out.println("Expected argument: Path to Postman Collection file (Only v2+ exported json files)");
+		} else {
+			String postmanJsonPath = args[0];
+
+			JsonJmxConverter converter = new JsonJmxConverter();
+			converter.convert(postmanJsonPath);
+		}
 
 	}
-	
-	
 
 }
