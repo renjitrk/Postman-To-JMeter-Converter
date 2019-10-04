@@ -4,7 +4,7 @@ Converts Postman Collection file (V2.1 JSON Export) to JMeter (JMX) file with li
 For quick use, packaged jar file included in the repo at /master/PostmanToJMeterConverter/release [here](https://github.com/renjitrk/Postman-To-JMeter-Converter/tree/master/PostmanToJMeterConverter/release)
 
 To Run:
-java -jar PostmanToJMeterConverter.jar "<Path to Postman Collection V2.1 Export>"
+java -jar PostmanToJMeterConverter.jar "\<Path to Postman Collection V2.1 Export\>"
 
 Note:
 Only V2.1 export file is accepted.
