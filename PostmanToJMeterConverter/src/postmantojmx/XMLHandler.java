@@ -604,7 +604,6 @@ public class XMLHandler {
 
 				for (int i = 0; i < ja.size(); i++) {
 					tempObj = (JSONObject) ja.get(i);
-					System.out.println(tempObj);
 					
 					innerElement = document.createElement("elementProp");
 					innerElement.setAttribute("name", "");
