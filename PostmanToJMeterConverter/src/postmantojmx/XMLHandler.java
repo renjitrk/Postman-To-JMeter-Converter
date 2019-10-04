@@ -15,7 +15,10 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -159,7 +162,7 @@ public class XMLHandler {
 		} catch (TransformerException e) {
 
 		}
-		
+
 		System.out.println("XML Successfully saved at: " + xmlFilePath + "..");
 	}
 
@@ -257,8 +260,9 @@ public class XMLHandler {
 	public Element createHTTPRequest(Element parentElement, JSONObject requestParams) {
 
 		String apiName, description, protocol, url, port, path, method, contentEncoding, embedded_url_re,
-				connect_timeout, response_timeout;
+				connect_timeout, response_timeout, bodyMode, body, headers;
 		Boolean follow_redirects, auto_redirects, use_keepalive, DO_MULTIPART_POST;
+		body = "";
 
 //		get apiName
 		if (requestParams.containsKey("apiName"))
@@ -350,6 +354,26 @@ public class XMLHandler {
 		else
 			DO_MULTIPART_POST = false;
 
+//		get bodyMode
+		if (requestParams.containsKey("bodyMode"))
+			bodyMode = requestParams.get("bodyMode").toString();
+		else
+			bodyMode = "";
+
+//		get body urlencoded
+		if (bodyMode.equalsIgnoreCase("urlencoded"))
+			body = requestParams.get("urlencodedBody").toString();
+
+//		get body payload
+		else if (bodyMode.equalsIgnoreCase("raw"))
+			body = requestParams.get("rawBody").toString();
+
+//		get headers
+		if (requestParams.containsKey("headers"))
+			headers = requestParams.get("headers").toString();
+		else
+			headers = "";
+
 //		HTTPSamplerProxy element
 		Element httpSamplerProxy = document.createElement("HTTPSamplerProxy");
 		httpSamplerProxy.setAttribute("enabled", "true");
@@ -366,12 +390,20 @@ public class XMLHandler {
 
 //		elementProp element
 		Element elementProp = document.createElement("elementProp");
-		elementProp.setAttribute("enabled", "true");
-		elementProp.setAttribute("testname", "User Defined Variables");
-		elementProp.setAttribute("testclass", "Arguments");
-		elementProp.setAttribute("guiclass", "HTTPArgumentsPanel");
 		elementProp.setAttribute("elementType", "Arguments");
 		elementProp.setAttribute("name", "HTTPsampler.Arguments");
+
+		if (bodyMode.equalsIgnoreCase("raw")) {
+			Element boolProp = document.createElement("boolProp");
+			boolProp.setAttribute("name", "HTTPSampler.postBodyRaw");
+			boolProp.appendChild(document.createTextNode("true"));
+			httpSamplerProxy.appendChild(boolProp);
+		} else if (bodyMode.equalsIgnoreCase("urlencoded")) {
+			elementProp.setAttribute("enabled", "true");
+			elementProp.setAttribute("testname", "User Defined Variables");
+			elementProp.setAttribute("testclass", "Arguments");
+			elementProp.setAttribute("guiclass", "HTTPArgumentsPanel");
+		}
 		httpSamplerProxy.appendChild(elementProp);
 
 //		collectionProp element
@@ -457,12 +489,144 @@ public class XMLHandler {
 		stringProp13.appendChild(document.createTextNode(response_timeout));
 		httpSamplerProxy.appendChild(stringProp13);
 
+//		urlencoded collectionProp element
+		if (bodyMode.equalsIgnoreCase("urlencoded")) {
+			addArgumentsToRequest(body, collectionProp);
+		}
+
+//		payload collectionProp element
+		else if (bodyMode.equalsIgnoreCase("raw")) {
+			addPayloadToRequest(body, collectionProp);
+		}
+
 //		return hashTree element
 		Element returnElement = document.createElement("hashTree");
 		parentElement.appendChild(returnElement);
 
+		addHeaders(headers, returnElement);
+
 		return returnElement;
 
+	}
+
+	private void addArgumentsToRequest(String urlencoded, Element collectionProp) {
+
+		try {
+			JSONArray ja = (JSONArray) new JSONParser().parse(urlencoded);
+			JSONObject tempObj;
+			Element element, childElement;
+
+			for (int i = 0; i < ja.size(); i++) {
+				tempObj = (JSONObject) ja.get(i);
+
+				element = document.createElement("elementProp");
+				element.setAttribute("elementType", "HTTPArgument");
+				element.setAttribute("name", tempObj.get("key").toString());
+				collectionProp.appendChild(element);
+
+				childElement = document.createElement("boolProp");
+				childElement.setAttribute("name", "HTTPArgument.always_encode");
+				childElement.appendChild(document.createTextNode("false"));
+				element.appendChild(childElement);
+
+				childElement = document.createElement("stringProp");
+				childElement.setAttribute("name", "Argument.value");
+				childElement.appendChild(document.createTextNode(tempObj.get("value").toString()));
+				element.appendChild(childElement);
+
+				childElement = document.createElement("stringProp");
+				childElement.setAttribute("name", "Argument.metadata");
+				childElement.appendChild(document.createTextNode("="));
+				element.appendChild(childElement);
+
+				childElement = document.createElement("boolProp");
+				childElement.setAttribute("name", "HTTPArgument.use_equals");
+				childElement.appendChild(document.createTextNode("true"));
+				element.appendChild(childElement);
+
+				childElement = document.createElement("stringProp");
+				childElement.setAttribute("name", "Argument.name");
+				childElement.appendChild(document.createTextNode(tempObj.get("key").toString()));
+				element.appendChild(childElement);
+			}
+
+		} catch (ParseException e) {
+			System.out.println(urlencoded);
+			e.printStackTrace();
+		}
+
+	}
+
+	private void addPayloadToRequest(String payload, Element collectionProp) {
+		Element element = document.createElement("elementProp");
+		element.setAttribute("elementType", "HTTPArgument");
+		element.setAttribute("name", "");
+		collectionProp.appendChild(element);
+
+		Element childElement = document.createElement("boolProp");
+		childElement.setAttribute("name", "HTTPArgument.always_encode");
+		childElement.appendChild(document.createTextNode("false"));
+		element.appendChild(childElement);
+
+		childElement = document.createElement("stringProp");
+		childElement.setAttribute("name", "Argument.value");
+		childElement.appendChild(document.createTextNode(payload));
+		element.appendChild(childElement);
+
+		childElement = document.createElement("stringProp");
+		childElement.setAttribute("name", "Argument.metadata");
+		childElement.appendChild(document.createTextNode("="));
+		element.appendChild(childElement);
+
+	}
+
+	private void addHeaders(String headers, Element parentElement) {
+
+		Element element, childElement, innerElement, headerList;
+		JSONObject tempObj;
+		JSONArray ja;
+
+		try {
+
+			ja = (JSONArray) new JSONParser().parse(headers);
+
+			if (ja.size() > 0) {
+				element = document.createElement("HeaderManager");
+				element.setAttribute("guiclass", "HeaderPanel");
+				element.setAttribute("testclass", "HeaderManager");
+				element.setAttribute("testname", "HTTP Header Manager");
+				element.setAttribute("enabled", "true");
+				parentElement.appendChild(element);
+
+				childElement = document.createElement("collectionProp");
+				childElement.setAttribute("name", "HeaderManager.headers");
+				element.appendChild(childElement);
+
+				for (int i = 0; i < ja.size(); i++) {
+					tempObj = (JSONObject) ja.get(i);
+					System.out.println(tempObj);
+					
+					innerElement = document.createElement("elementProp");
+					innerElement.setAttribute("name", "");
+					innerElement.setAttribute("elementType", "Header");
+					childElement.appendChild(innerElement);
+
+					headerList = document.createElement("stringProp");
+					headerList.setAttribute("name", "Header.name");
+					headerList.appendChild(document.createTextNode(tempObj.get("key").toString()));
+					innerElement.appendChild(headerList);
+
+					headerList = document.createElement("stringProp");
+					headerList.setAttribute("name", "Header.value");
+					headerList.appendChild(document.createTextNode(tempObj.get("value").toString()));
+					innerElement.appendChild(headerList);
+				}
+			}
+
+		} catch (ParseException e) {
+			System.out.println(headers);
+			e.printStackTrace();
+		}
 	}
 
 }

@@ -191,6 +191,41 @@ public class JSONHandler {
 			temp = "";
 		apiParamsOut.put("method", temp);
 
+//		bodyMode
+		tempObj = (JSONObject) apiParamsInput.get("request");
+		if (tempObj.containsKey("body"))
+			if (((JSONObject)tempObj.get("body")).containsKey("mode")) {
+				temp = (((JSONObject)tempObj.get("body")).get("mode")).toString();
+			} else
+				temp = "";
+		apiParamsOut.put("bodyMode", temp);
+
+//		urlencoded body
+		if (temp.equalsIgnoreCase("urlencoded")) {
+			if (((JSONObject)tempObj.get("body")).containsKey("urlencoded")) 
+				temp = (((JSONObject)tempObj.get("body")).get("urlencoded")).toString();
+			else
+				temp = "";
+			apiParamsOut.put("urlencodedBody", temp);
+		}
+
+//		raw body
+		else if (temp.equalsIgnoreCase("raw")) {
+			if (((JSONObject)tempObj.get("body")).containsKey("raw")) 
+				temp = (((JSONObject)tempObj.get("body")).get("raw")).toString();
+			else
+				temp = "";
+			apiParamsOut.put("rawBody", temp);
+		}
+
+//		header
+		tempObj = (JSONObject) apiParamsInput.get("request");
+		if (tempObj.containsKey("header"))
+			temp = tempObj.get("header").toString();
+		else
+			temp = "";
+		apiParamsOut.put("headers", temp);
+
 		return apiParamsOut;
 	}
 
