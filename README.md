@@ -10,3 +10,9 @@ Note:
 Only V2.1 export file is accepted.
 The folder used in Postman is inharited to JMeter by using SimpleControllers with the folder name.
 Headers to each requirest are nested under the HTTP Request handler.
+Tested only for Restful APIs (HTTP Request).
+
+Versions:
+V2 - Added Variable Management (All Postman variables with be formated with JMeter format and will be listed in Variables Config for easy usage)
+V0 - Inital Commit with Header and Body incomplete
+V1 - First Complete Implementation
