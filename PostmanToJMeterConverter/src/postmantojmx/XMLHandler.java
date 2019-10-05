@@ -26,6 +26,7 @@ public class XMLHandler {
 
 	private Document document;
 	private String JmxPath;
+	private Element threadGroupElement;
 
 	public XMLHandler(String jmxPath) throws IOException {
 
@@ -65,18 +66,18 @@ public class XMLHandler {
 			DocumentBuilder documentBuilder = documentFactory.newDocumentBuilder();
 			document = documentBuilder.newDocument();
 
-//          JMeter root element
+			// JMeter root element
 			Element root = document.createElement("jmeterTestPlan");
 			root.setAttribute("jmeter", "5.0 r1840935");
 			root.setAttribute("properties", "5.0");
 			root.setAttribute("version", "1.2");
 			document.appendChild(root);
 
-//          Root hashTree element
+			// Root hashTree element
 			Element hashTree = document.createElement("hashTree");
 			root.appendChild(hashTree);
 
-//          testPlan element
+			// testPlan element
 			Element testPlan = document.createElement("TestPlan");
 			testPlan.setAttribute("enabled", "true");
 			testPlan.setAttribute("testname", apiDetails[0] + " - TestPlan");
@@ -84,35 +85,35 @@ public class XMLHandler {
 			testPlan.setAttribute("guiclass", "TestPlanGui");
 			hashTree.appendChild(testPlan);
 
-//          return hashTree element
+			// return hashTree element
 			Element returnElement = document.createElement("hashTree");
 			hashTree.appendChild(returnElement);
 
-//        	testPlan comments element
+			// testPlan comments element
 			Element stringProp = document.createElement("stringProp");
 			stringProp.setAttribute("name", "TestPlan.comments");
 			stringProp.appendChild(document.createTextNode(apiDetails[1]));
 			testPlan.appendChild(stringProp);
 
-//          testPlan comments element
+			// testPlan comments element
 			Element boolProp1 = document.createElement("boolProp");
 			boolProp1.setAttribute("name", "TestPlan.functional_mode");
 			boolProp1.appendChild(document.createTextNode("false"));
 			testPlan.appendChild(boolProp1);
 
-//          testPlan comments element
+			// testPlan comments element
 			Element boolProp2 = document.createElement("boolProp");
 			boolProp2.setAttribute("name", "TestPlan.tearDown_on_shutdown");
 			boolProp2.appendChild(document.createTextNode("true"));
 			testPlan.appendChild(boolProp2);
 
-//          testPlan comments element
+			// testPlan comments element
 			Element boolProp3 = document.createElement("boolProp");
 			boolProp3.setAttribute("name", "TestPlan.serialize_threadgroups");
 			boolProp3.appendChild(document.createTextNode("false"));
 			testPlan.appendChild(boolProp3);
 
-//            testPlan elementProp element
+			// testPlan elementProp element
 			Element elementProp = document.createElement("elementProp");
 			elementProp.setAttribute("enabled", "true");
 			elementProp.setAttribute("testname", "User Defined Variables");
@@ -122,15 +123,15 @@ public class XMLHandler {
 			elementProp.setAttribute("name", "TestPlan.user_defined_variables");
 			testPlan.appendChild(elementProp);
 
-//            elementProp collectionProp element
+			// elementProp collectionProp element
 			Element collectionProp = document.createElement("collectionProp");
 			collectionProp.setAttribute("name", "Arguments.arguments");
 			elementProp.appendChild(collectionProp);
 
-//            testPlan comments element
+			// testPlan comments element
 			Element stringProp1 = document.createElement("stringProp");
 			stringProp1.setAttribute("name", "TestPlan.user_define_classpath");
-			stringProp1.appendChild(document.createTextNode(apiDetails[1].substring(0, 10)));
+			stringProp1.appendChild(document.createTextNode(apiDetails[1]));
 			testPlan.appendChild(stringProp1);
 
 			return returnElement;
@@ -149,7 +150,7 @@ public class XMLHandler {
 
 		try {
 
-//        transform the DOM Object to an XML File
+			// transform the DOM Object to an XML File
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
 			Transformer transformer = transformerFactory.newTransformer();
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -168,7 +169,7 @@ public class XMLHandler {
 
 	public Element createThreadGroup(Element parentElement) {
 
-//		ThreadGroup Element
+		// ThreadGroup Element
 		Element threadGroup = document.createElement("ThreadGroup");
 		threadGroup.setAttribute("enabled", "true");
 		threadGroup.setAttribute("testname", "Thread Group");
@@ -176,13 +177,13 @@ public class XMLHandler {
 		threadGroup.setAttribute("guiclass", "ThreadGroupGui");
 		parentElement.appendChild(threadGroup);
 
-//		stringProp element
+		// stringProp element
 		Element stringProp = document.createElement("stringProp");
 		stringProp.setAttribute("name", "ThreadGroup.on_sample_error");
 		stringProp.appendChild(document.createTextNode("continue"));
 		threadGroup.appendChild(stringProp);
 
-//		thread elementProp Element
+		// thread elementProp Element
 		Element elementProp = document.createElement("elementProp");
 		elementProp.setAttribute("enabled", "true");
 		elementProp.setAttribute("testname", "Loop Controller");
@@ -192,56 +193,59 @@ public class XMLHandler {
 		elementProp.setAttribute("name", "ThreadGroup.main_controller");
 		threadGroup.appendChild(elementProp);
 
-//      elementProp boolProp element
+		// elementProp boolProp element
 		Element boolProp1 = document.createElement("boolProp");
 		boolProp1.setAttribute("name", "LoopController.continue_forever");
 		boolProp1.appendChild(document.createTextNode("false"));
 		elementProp.appendChild(boolProp1);
 
-//		elementProp comments element
+		// elementProp comments element
 		Element stringProp1 = document.createElement("stringProp");
 		stringProp1.setAttribute("name", "LoopController.loops");
 		stringProp1.appendChild(document.createTextNode("1"));
 		elementProp.appendChild(stringProp1);
 
-//		threadGroup comments element
+		// threadGroup comments element
 		Element stringProp2 = document.createElement("stringProp");
 		stringProp2.setAttribute("name", "ThreadGroup.num_threads");
 		stringProp2.appendChild(document.createTextNode("1"));
 		threadGroup.appendChild(stringProp2);
 
-//		threadGroup comments element
+		// threadGroup comments element
 		Element stringProp3 = document.createElement("stringProp");
 		stringProp3.setAttribute("name", "ThreadGroup.ramp_time");
 		stringProp3.appendChild(document.createTextNode("1"));
 		threadGroup.appendChild(stringProp3);
 
-//		threadGroup boolProp element
+		// threadGroup boolProp element
 		Element boolProp2 = document.createElement("boolProp");
 		boolProp2.setAttribute("name", "ThreadGroup.scheduler");
 		boolProp2.appendChild(document.createTextNode("false"));
 		threadGroup.appendChild(boolProp2);
 
-//		threadGroup comments element
+		// threadGroup comments element
 		Element stringProp4 = document.createElement("stringProp");
 		stringProp4.setAttribute("name", "ThreadGroup.duration");
 		threadGroup.appendChild(stringProp4);
 
-//		threadGroup comments element
+		// threadGroup comments element
 		Element stringProp5 = document.createElement("stringProp");
 		stringProp5.setAttribute("name", "ThreadGroup.ramp_time");
 		threadGroup.appendChild(stringProp5);
 
-//		return hashTree element
+		// return hashTree element
 		Element returnElement = document.createElement("hashTree");
 		parentElement.appendChild(returnElement);
+
+		// store Threadgroup elemtn
+		threadGroupElement = returnElement;
 
 		return returnElement;
 	}
 
 	public Element createSimpleControler(Element parentElement, String ControllerName) {
 
-//		GenericController element
+		// GenericController element
 		Element genericController = document.createElement("GenericController");
 		genericController.setAttribute("enabled", "true");
 		genericController.setAttribute("testname", ControllerName);
@@ -249,7 +253,7 @@ public class XMLHandler {
 		genericController.setAttribute("guiclass", "LogicControllerGui");
 		parentElement.appendChild(genericController);
 
-//		return hashTree element
+		// return hashTree element
 		Element returnElement = document.createElement("hashTree");
 		parentElement.appendChild(returnElement);
 
@@ -264,117 +268,117 @@ public class XMLHandler {
 		Boolean follow_redirects, auto_redirects, use_keepalive, DO_MULTIPART_POST;
 		body = "";
 
-//		get apiName
+		// get apiName
 		if (requestParams.containsKey("apiName"))
 			apiName = requestParams.get("apiName").toString();
 		else
 			apiName = "";
 
-//		get description
+		// get description
 		if (requestParams.containsKey("description"))
 			description = requestParams.get("description").toString();
 		else
 			description = "";
 
-//		get protocol
+		// get protocol
 		if (requestParams.containsKey("protocol"))
 			protocol = requestParams.get("protocol").toString();
 		else
 			protocol = "";
 
-//		get url
+		// get url
 		if (requestParams.containsKey("url"))
 			url = requestParams.get("url").toString();
 		else
 			url = "";
 
-//		get port
+		// get port
 		if (requestParams.containsKey("port"))
 			port = requestParams.get("port").toString();
 		else
 			port = "";
 
-//		get path
+		// get path
 		if (requestParams.containsKey("path"))
 			path = requestParams.get("path").toString();
 		else
 			path = "";
 
-//		get method
+		// get method
 		if (requestParams.containsKey("method"))
 			method = requestParams.get("method").toString();
 		else
 			method = "";
 
-//		get contentEncoding
+		// get contentEncoding
 		if (requestParams.containsKey("contentEncoding"))
 			contentEncoding = requestParams.get("contentEncoding").toString();
 		else
 			contentEncoding = "";
 
-//		get embedded_url_re
+		// get embedded_url_re
 		if (requestParams.containsKey("embedded_url_re"))
 			embedded_url_re = requestParams.get("embedded_url_re").toString();
 		else
 			embedded_url_re = "";
 
-//		get connect_timeout
+		// get connect_timeout
 		if (requestParams.containsKey("connect_timeout"))
 			connect_timeout = requestParams.get("connect_timeout").toString();
 		else
 			connect_timeout = "";
 
-//		get response_timeout
+		// get response_timeout
 		if (requestParams.containsKey("response_timeout"))
 			response_timeout = requestParams.get("response_timeout").toString();
 		else
 			response_timeout = "";
 
-//		get follow_redirects
+		// get follow_redirects
 		if (requestParams.containsKey("follow_redirects"))
 			follow_redirects = (Boolean) requestParams.get("follow_redirects");
 		else
 			follow_redirects = true;
 
-//		get auto_redirects
+		// get auto_redirects
 		if (requestParams.containsKey("auto_redirects"))
 			auto_redirects = (Boolean) requestParams.get("auto_redirects");
 		else
 			auto_redirects = false;
 
-//		get use_keepalive
+		// get use_keepalive
 		if (requestParams.containsKey("use_keepalive"))
 			use_keepalive = (Boolean) requestParams.get("use_keepalive");
 		else
 			use_keepalive = true;
 
-//		get DO_MULTIPART_POST
+		// get DO_MULTIPART_POST
 		if (requestParams.containsKey("DO_MULTIPART_POST"))
 			DO_MULTIPART_POST = (Boolean) requestParams.get("DO_MULTIPART_POST");
 		else
 			DO_MULTIPART_POST = false;
 
-//		get bodyMode
+		// get bodyMode
 		if (requestParams.containsKey("bodyMode"))
 			bodyMode = requestParams.get("bodyMode").toString();
 		else
 			bodyMode = "";
 
-//		get body urlencoded
+		// get body urlencoded
 		if (bodyMode.equalsIgnoreCase("urlencoded"))
 			body = requestParams.get("urlencodedBody").toString();
 
-//		get body payload
+		// get body payload
 		else if (bodyMode.equalsIgnoreCase("raw"))
 			body = requestParams.get("rawBody").toString();
 
-//		get headers
+		// get headers
 		if (requestParams.containsKey("headers"))
 			headers = requestParams.get("headers").toString();
 		else
 			headers = "";
 
-//		HTTPSamplerProxy element
+		// HTTPSamplerProxy element
 		Element httpSamplerProxy = document.createElement("HTTPSamplerProxy");
 		httpSamplerProxy.setAttribute("enabled", "true");
 		httpSamplerProxy.setAttribute("testname", apiName);
@@ -382,13 +386,13 @@ public class XMLHandler {
 		httpSamplerProxy.setAttribute("guiclass", "HttpTestSampleGui");
 		parentElement.appendChild(httpSamplerProxy);
 
-//		response_timeout stringProp element
+		// response_timeout stringProp element
 		Element stringProp = document.createElement("stringProp");
 		stringProp.setAttribute("name", "TestPlan.comments");
 		stringProp.appendChild(document.createTextNode(description));
 		httpSamplerProxy.appendChild(stringProp);
 
-//		elementProp element
+		// elementProp element
 		Element elementProp = document.createElement("elementProp");
 		elementProp.setAttribute("elementType", "Arguments");
 		elementProp.setAttribute("name", "HTTPsampler.Arguments");
@@ -406,100 +410,100 @@ public class XMLHandler {
 		}
 		httpSamplerProxy.appendChild(elementProp);
 
-//		collectionProp element
+		// collectionProp element
 		Element collectionProp = document.createElement("collectionProp");
 		collectionProp.setAttribute("name", "Arguments.arguments");
 		elementProp.appendChild(collectionProp);
 
-//		URL stringProp element
+		// URL stringProp element
 		Element stringProp1 = document.createElement("stringProp");
 		stringProp1.setAttribute("name", "HTTPSampler.domain");
 		stringProp1.appendChild(document.createTextNode(url));
 		httpSamplerProxy.appendChild(stringProp1);
 
-//		Port stringProp element
+		// Port stringProp element
 		Element stringProp2 = document.createElement("stringProp");
 		stringProp2.setAttribute("name", "HTTPSampler.port");
 		stringProp2.appendChild(document.createTextNode(port));
 		httpSamplerProxy.appendChild(stringProp2);
 
-//		Protocol stringProp element
+		// Protocol stringProp element
 		Element stringProp3 = document.createElement("stringProp");
 		stringProp3.setAttribute("name", "HTTPSampler.protocol");
 		stringProp3.appendChild(document.createTextNode(protocol));
 		httpSamplerProxy.appendChild(stringProp3);
 
-//		contentEncoding stringProp element
+		// contentEncoding stringProp element
 		Element stringProp4 = document.createElement("stringProp");
 		stringProp4.setAttribute("name", "HTTPSampler.contentEncoding");
 		stringProp4.appendChild(document.createTextNode(contentEncoding));
 		httpSamplerProxy.appendChild(stringProp4);
 
-//		Path stringProp element
+		// Path stringProp element
 		Element stringProp5 = document.createElement("stringProp");
 		stringProp5.setAttribute("name", "HTTPSampler.path");
 		stringProp5.appendChild(document.createTextNode(path));
 		httpSamplerProxy.appendChild(stringProp5);
 
-//		method stringProp element
+		// method stringProp element
 		Element stringProp6 = document.createElement("stringProp");
 		stringProp6.setAttribute("name", "HTTPSampler.method");
 		stringProp6.appendChild(document.createTextNode(method));
 		httpSamplerProxy.appendChild(stringProp6);
 
-//		follow_redirects stringProp element
+		// follow_redirects stringProp element
 		Element stringProp7 = document.createElement("stringProp");
 		stringProp7.setAttribute("name", "HTTPSampler.follow_redirects");
 		stringProp7.appendChild(document.createTextNode(follow_redirects.toString()));
 		httpSamplerProxy.appendChild(stringProp7);
 
-//		auto_redirects stringProp element
+		// auto_redirects stringProp element
 		Element stringProp8 = document.createElement("stringProp");
 		stringProp8.setAttribute("name", "HTTPSampler.auto_redirects");
 		stringProp8.appendChild(document.createTextNode(auto_redirects.toString()));
 		httpSamplerProxy.appendChild(stringProp8);
 
-//		use_keepalive stringProp element
+		// use_keepalive stringProp element
 		Element stringProp9 = document.createElement("stringProp");
 		stringProp9.setAttribute("name", "HTTPSampler.use_keepalive");
 		stringProp9.appendChild(document.createTextNode(use_keepalive.toString()));
 		httpSamplerProxy.appendChild(stringProp9);
 
-//		DO_MULTIPART_POST stringProp element
+		// DO_MULTIPART_POST stringProp element
 		Element stringProp10 = document.createElement("stringProp");
 		stringProp10.setAttribute("name", "HTTPSampler.DO_MULTIPART_POST");
 		stringProp10.appendChild(document.createTextNode(DO_MULTIPART_POST.toString()));
 		httpSamplerProxy.appendChild(stringProp10);
 
-//		embedded_url_re stringProp element
+		// embedded_url_re stringProp element
 		Element stringProp11 = document.createElement("stringProp");
 		stringProp11.setAttribute("name", "HTTPSampler.embedded_url_re");
 		stringProp11.appendChild(document.createTextNode(embedded_url_re));
 		httpSamplerProxy.appendChild(stringProp11);
 
-//		connect_timeout stringProp element
+		// connect_timeout stringProp element
 		Element stringProp12 = document.createElement("stringProp");
 		stringProp12.setAttribute("name", "HTTPSampler.connect_timeout");
 		stringProp12.appendChild(document.createTextNode(connect_timeout));
 		httpSamplerProxy.appendChild(stringProp12);
 
-//		response_timeout stringProp element
+		// response_timeout stringProp element
 		Element stringProp13 = document.createElement("stringProp");
 		stringProp13.setAttribute("name", "HTTPSampler.response_timeout");
 		stringProp13.appendChild(document.createTextNode(response_timeout));
 		httpSamplerProxy.appendChild(stringProp13);
 
-//		urlencoded collectionProp element
+		// urlencoded collectionProp element
 		if (bodyMode.equalsIgnoreCase("urlencoded")) {
 			addArgumentsToRequest(body, collectionProp);
 		}
 
-//		payload collectionProp element
+		// payload collectionProp element
 		else if (bodyMode.equalsIgnoreCase("raw")) {
 			addPayloadToRequest(body, collectionProp);
 		}
 
-//		return hashTree element
+		// return hashTree element
 		Element returnElement = document.createElement("hashTree");
 		parentElement.appendChild(returnElement);
 
@@ -604,7 +608,7 @@ public class XMLHandler {
 
 				for (int i = 0; i < ja.size(); i++) {
 					tempObj = (JSONObject) ja.get(i);
-					
+
 					innerElement = document.createElement("elementProp");
 					innerElement.setAttribute("name", "");
 					innerElement.setAttribute("elementType", "Header");
@@ -626,6 +630,52 @@ public class XMLHandler {
 			System.out.println(headers);
 			e.printStackTrace();
 		}
+	}
+
+	public void createUserDefinedVariables(String variableList[]) {
+
+		if (variableList.length == 0)
+			return;
+		
+		Element elementProp, stringProp;
+
+		Element args = document.createElement("Arguments");
+		args.setAttribute("guiclass", "ArgumentsPanel");
+		args.setAttribute("testclass", "Arguments");
+		args.setAttribute("testname", "Variables");
+		args.setAttribute("enabled", "true");
+		// threadGroupElement.appendChild(args);
+		threadGroupElement.insertBefore(args, threadGroupElement.getChildNodes().item(0));
+		System.out.println(threadGroupElement.getFirstChild().getAttributes());
+
+		Element hashTree = document.createElement("hashTree");
+		threadGroupElement.insertBefore(hashTree, threadGroupElement.getChildNodes().item(1));
+
+		Element collectionProp = document.createElement("collectionProp");
+		collectionProp.setAttribute("name", "Arguments.arguments");
+		args.appendChild(collectionProp);
+
+		for (int i = 0; i < variableList.length; i++) {
+			elementProp = document.createElement("elementProp");
+			elementProp.setAttribute("name", variableList[i]);
+			elementProp.setAttribute("elementType", "Argument");
+			collectionProp.appendChild(elementProp);
+
+			stringProp = document.createElement("stringProp");
+			stringProp.setAttribute("name", "Argument.name");
+			stringProp.appendChild(document.createTextNode(variableList[i]));
+			elementProp.appendChild(stringProp);
+
+			stringProp = document.createElement("stringProp");
+			stringProp.setAttribute("name", "Argument.value");
+			elementProp.appendChild(stringProp);
+
+			stringProp = document.createElement("stringProp");
+			stringProp.setAttribute("name", "Argument.metadata");
+			stringProp.appendChild(document.createTextNode("="));
+			elementProp.appendChild(stringProp);
+		}
+
 	}
 
 }

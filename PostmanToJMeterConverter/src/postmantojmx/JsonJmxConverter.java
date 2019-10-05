@@ -42,6 +42,9 @@ public class JsonJmxConverter {
 		for (int i = 0; i < jsonItems.size(); i++) {
 			writeItemtoJMX(jmxCurrentElement, (JSONObject) jsonItems.get(i));
 		}
+		
+		String variableNames[] = postmanHandler.getVariableNames();
+		xmlHandler.createUserDefinedVariables(variableNames);
 
 //		finally write the XML into JMX file
 		xmlHandler.writeXML();
